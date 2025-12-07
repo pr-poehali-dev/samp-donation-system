@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "Test webhook health check",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "update_id": 123456
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "ok": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

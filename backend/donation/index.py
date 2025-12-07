@@ -1,13 +1,14 @@
 import json
 import os
 import psycopg2
+import pymysql
 import requests
 from typing import Dict, Any
 from datetime import datetime
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Обработка платежей: сохраняет данные в БД и отправляет уведомление в Telegram
+    Обработка платежей: сохраняет данные в БД и отправляет уведомление в Telegram с кнопками
     Args: event - данные HTTP запроса с nickname и amount
           context - контекст выполнения функции
     Returns: HTTP response с результатом операции
@@ -81,7 +82,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         telegram_chat_id = '7569853207'
         
         message = f"""🎮 Новый донат SAMP!
-        
+
 👤 Игрок: {nickname}
 💰 Сумма: {amount} донат рублей
 💳 Карта: 2200 7020 5523 2552
@@ -90,13 +91,28 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
 Ожидает подтверждения оплаты."""
         
+        keyboard = {
+            "inline_keyboard": [
+                [
+                    {
+                        "text": "✅ Оплатил",
+                        "callback_data": f"approve_{donation_id}_{nickname}_{amount}"
+                    },
+                    {
+                        "text": "❌ Не оплатил",
+                        "callback_data": f"reject_{donation_id}"
+                    }
+                ]
+            ]
+        }
+        
         telegram_sent = False
         if telegram_token:
             telegram_url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
             telegram_response = requests.post(telegram_url, json={
                 'chat_id': telegram_chat_id,
                 'text': message,
-                'parse_mode': 'HTML'
+                'reply_markup': keyboard
             }, timeout=10)
             
             if telegram_response.status_code == 200:

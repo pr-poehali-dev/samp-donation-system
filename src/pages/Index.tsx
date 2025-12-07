@@ -25,11 +25,40 @@ export default function Index() {
     setStep('payment');
   };
 
-  const handlePayment = () => {
-    toast({
-      title: 'Заявка отправлена',
-      description: `Данные отправлены в Telegram. Ожидайте начисления ${amount} донат рублей на ник ${nickname}`,
-    });
+  const handlePayment = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/fd800dc4-3a7e-4679-9120-804c85a4ef8d', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nickname,
+          amount: parseInt(amount),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        toast({
+          title: '✅ Заявка отправлена',
+          description: `Данные отправлены администратору в Telegram. Ожидайте начисления ${amount} донат рублей на ник ${nickname}`,
+        });
+      } else {
+        toast({
+          title: 'Ошибка',
+          description: data.error || 'Не удалось отправить заявку',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка подключения',
+        description: 'Проверьте интернет соединение',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
