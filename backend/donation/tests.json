@@ -1,0 +1,48 @@
+{
+  "tests": [
+    {
+      "name": "Test donation creation with valid data",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "nickname": "TestPlayer",
+        "amount": 500
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "donation_id": "number",
+        "telegram_sent": "boolean",
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test missing nickname",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "amount": 100
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test invalid amount",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "nickname": "TestPlayer",
+        "amount": -50
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
